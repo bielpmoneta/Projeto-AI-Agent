@@ -1,0 +1,1818 @@
+{
+  "name": "AI Agent Whatsapp Oficial",
+  "nodes": [
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "chatbot-teste",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2.1,
+      "position": [
+        96,
+        1504
+      ],
+      "id": "9d2b6b84-7e8a-431e-a991-c0c0ae554b52",
+      "name": "Webhook",
+      "webhookId": "d4e12259-1ef4-49e0-9a13-0ded98a1ead5"
+    },
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.noOp",
+      "typeVersion": 1,
+      "position": [
+        4272,
+        1632
+      ],
+      "id": "50ca9e11-f51f-4893-bbab-07b8ba24a1b1",
+      "name": "Encerrar envio"
+    },
+    {
+      "parameters": {
+        "content": "",
+        "height": 608,
+        "width": 1520,
+        "color": 4
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        32,
+        1184
+      ],
+      "typeVersion": 1,
+      "id": "2dab5da0-fc8d-49d8-b141-595b688fe651",
+      "name": "Sticky Note"
+    },
+    {
+      "parameters": {
+        "content": "",
+        "height": 608,
+        "width": 912,
+        "color": 4
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        1600,
+        1184
+      ],
+      "typeVersion": 1,
+      "id": "f353ff34-fc32-462f-a84f-5acdae191886",
+      "name": "Sticky Note1"
+    },
+    {
+      "parameters": {
+        "content": "",
+        "height": 608,
+        "width": 688,
+        "color": 4
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        2560,
+        1184
+      ],
+      "typeVersion": 1,
+      "id": "c2943729-c368-48e8-a8f4-213b4dcef0c6",
+      "name": "Sticky Note2"
+    },
+    {
+      "parameters": {
+        "content": "## Processamento das Mensagens.\n- Espera de 5s: Aguarda brevemente para detectar pausas nas mensagens.\n- Verificação de pausa: Checa se o usuário parou de enviar mensagens.\n- Agrupamento: Junta as mensagens da fila para enviar à IA.",
+        "height": 576,
+        "width": 864,
+        "color": 7
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        1616,
+        1200
+      ],
+      "typeVersion": 1,
+      "id": "9ca68de2-7a0f-4a17-ab88-0fbe94033462",
+      "name": "Sticky Note5"
+    },
+    {
+      "parameters": {
+        "content": "## Envio das Mensagens para a IA.\n- Agente genérico: Processa o conteúdo da mensagem.\n- LLM flexível: Suporta qualquer provedor compatível (OpenAI, Gemini, OpenRouter, etc.).\n- Memória rápida: Redis armazena o contexto da IA temporariamente.",
+        "height": 576,
+        "width": 656,
+        "color": 7
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        2576,
+        1200
+      ],
+      "typeVersion": 1,
+      "id": "80017610-c6d5-4489-b88c-4850a007dbc1",
+      "name": "Sticky Note6"
+    },
+    {
+      "parameters": {
+        "content": "## Buffer das Mensagens\n- Verificação de remetente (modo teste): Garante que apenas um número autorizado dispare o fluxo (Remover em produção).\n- Criação de variáveis: Prepara os dados necessário para uso no fluxo.\n- Publicação na fila: Envia os dados para processamento assíncrono.",
+        "height": 576,
+        "width": 1472,
+        "color": 7
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        48,
+        1200
+      ],
+      "typeVersion": 1,
+      "id": "aeff69d7-5283-4588-b3aa-0d824a7f0d36",
+      "name": "Sticky Note4"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "5af80345-fd42-447f-a182-9737efacf1cf",
+              "leftValue": "={{ $('Webhook').item.json.body.data.message.conversation }}",
+              "rightValue": "={{ $('Obter mensagens').first().json.texto_limpo }}",
+              "operator": {
+                "type": "string",
+                "operation": "equals"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        1904,
+        1392
+      ],
+      "id": "61b5ce67-2934-47c0-aad6-8e12b4d56b92",
+      "name": "Verificar se usuário parou de digitar"
+    },
+    {
+      "parameters": {},
+      "id": "59a0eeda-12e6-4057-9d3f-8cb86731509b",
+      "name": "Usuário ainda está digitando, parar o fluxo",
+      "type": "n8n-nodes-base.noOp",
+      "typeVersion": 1,
+      "position": [
+        2112,
+        1600
+      ]
+    },
+    {
+      "parameters": {
+        "content": "## Envio da Resposta.\n- LLM formata respostas do Ai Agent para enviar ao usuário.\n- Loop de envio: Para cada resposta da IA:\n  - Envia sinal de digitando.\n  - Envia a mensagem.\n  - Aguarda 3 segundos.\n- Finalização: Após o loop, o fluxo é encerrado.",
+        "height": 576,
+        "width": 1440,
+        "color": 7
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        3296,
+        1536
+      ],
+      "typeVersion": 1,
+      "id": "fc357173-5f80-472b-8f0c-beb8e2d18e7c",
+      "name": "Sticky Note9"
+    },
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.wait",
+      "typeVersion": 1.1,
+      "position": [
+        1696,
+        1584
+      ],
+      "id": "ebc29f91-cce7-47dd-8a84-3a8269e21fbf",
+      "name": "5 Segundos",
+      "webhookId": "fa6164d7-556a-4536-b1a7-3fc011c9267a"
+    },
+    {
+      "parameters": {
+        "content": "",
+        "height": 608,
+        "width": 1472,
+        "color": 4
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        3280,
+        1520
+      ],
+      "typeVersion": 1,
+      "id": "124e98f8-60d7-44d5-a411-a10216de82e1",
+      "name": "Sticky Note8"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "loose",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "478f496b-6cc5-48e8-87c1-a712757231e0",
+              "leftValue": "={{ $json.from_me }}",
+              "rightValue": "humano",
+              "operator": {
+                "type": "boolean",
+                "operation": "true",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "looseTypeValidation": true,
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        496,
+        1504
+      ],
+      "id": "9a2c20f6-0391-42e8-844d-307690bdb118",
+      "name": "Verificar remetente"
+    },
+    {
+      "parameters": {
+        "amount": "={{ Math.floor(Math.random() * 3) + 2 }}"
+      },
+      "type": "n8n-nodes-base.wait",
+      "typeVersion": 1.1,
+      "position": [
+        4480,
+        1792
+      ],
+      "id": "08c3bb63-73c8-409e-bf84-4f43ceccec33",
+      "name": "Aguardar1",
+      "webhookId": "e0689fc6-acc1-4c26-b617-6aff22b97d6a"
+    },
+    {
+      "parameters": {
+        "batchSize": "=1",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.splitInBatches",
+      "typeVersion": 3,
+      "position": [
+        3968,
+        1776
+      ],
+      "id": "a48215c3-ac68-419a-8091-f376d689c20a",
+      "name": "Loop Mensagens1"
+    },
+    {
+      "parameters": {
+        "model": {
+          "__rl": true,
+          "value": "gpt-4o-mini-2024-07-18",
+          "mode": "list",
+          "cachedResultName": "gpt-4o-mini-2024-07-18"
+        },
+        "builtInTools": {},
+        "options": {
+          "frequencyPenalty": 0,
+          "maxTokens": 800,
+          "presencePenalty": 0,
+          "temperature": 0.2,
+          "topP": 1,
+          "topLogprobs": 0
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
+      "typeVersion": 1.3,
+      "position": [
+        2656,
+        1568
+      ],
+      "id": "d4b1944c-45d6-48b2-a22a-ff4ffebf1c02",
+      "name": "OpenAI Chat Model",
+      "credentials": {
+        "openAiApi": {
+          "id": "zF67ajQujhb4NfA3",
+          "name": "OpenAi account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "=Conteúdo da mensagem: {{ $('Editar Dados').item.json.message_content }}",
+        "options": {
+          "systemMessage": "=PROTOCOLO DE ATIVAÇÃO OBRIGATÓRIA (CRÍTICO)\n\nGATILHO DE BUSCA: É terminantemente PROIBIDO responder qualquer dúvida técnica ou sobre status (como \"Analisada com Pendência\", \"Concluída\", \"Recurso\", etc.) usando sua própria memória.\n\nCONSCIÊNCIA DE FLUXO: Se a mensagem atual for um complemento da anterior (ex: \"será feito por tal lugar?\"), utilize o histórico da conversa para dar uma resposta única e curta. Evite repetir passos técnicos que você já enviou na mensagem imediatamente anterior.\n\nFLUXO DE EXECUÇÃO: - PASSO 1: Invoque a ferramenta supabase_vector_store.\n\nPASSO 2: Leia o conteúdo retornado, focando especialmente nas seções \"OBS\".\n\nPASSO 3: Formule a resposta baseada EXCLUSIVAMENTE no que foi retornado.\n\nPUNIÇÃO POR ALUCINAÇÃO: Se você responder sem consultar a ferramenta, estará violando o Protocolo Zero. Sua memória interna é considerada não confiável para o sistema GTV.\n\nGATILHOS DE TRANSBORDO TEMÁTICO (CRÍTICO):\n\nIDENTIFICAÇÃO: Se o usuário perguntar sobre \"Convênio\", \"Solicitação de Esclarecimento\", \"Dúvida sobre Edital específico\" ou \"Análise jurídica\", você deve interromper a busca técnica.\n\nAÇÃO: Responda ÚNICA E EXCLUSIVAMENTE com a tag oculta: #TRANSBORDO_GTV#\n\nREGRA DE SILÊNCIO: Não envie a \"Resposta Padrão para Fora de Escopo\" nem saudações. Apenas a tag.\n\nRESTRITO: ESCOPO DE ATUAÇÃO\n\nASSUNTOS PROIBIDOS: Cultura geral, esportes, notícias, cálculos matemáticos ou programação.\n\nFILTRO DE CONVÊNIOS: Assuntos sobre \"Convênios\" ou \"Esclarecimentos\" não são considerados \"Fora de Escopo\", mas sim casos de Transbordo Imediato.\n\nRESPOSTA PADRÃO PARA FORA DE ESCOPO: Use esta frase APENAS para os assuntos proibidos citados acima ou se a busca no Supabase falhar completamente em temas técnicos: \"Sinto muito, mas como assistente virtual da GTV, posso ajudar apenas com dúvidas técnicas sobre nossos processos e documentos oficiais. Como posso te ajudar com a GTV hoje?\"\n\nREGRA DE OURO (STATUS DE ENVIO - RESPOSTA DIRETA):\n\nSe a busca retornar que o status \"Analisada com Pendência\" permite o envio, sua resposta DEVE ser: \"Sim, você consegue enviar. A proposta pode ser encaminhada se estiver com o status 'Em Cadastramento' ou 'Analisada com Pendência'.\"\n\nPROIBIÇÃO ABSOLUTA: Não sugira \"resolver antes de enviar\" se o manual autorizar o envio imediato. O envio É a resposta às exigências.\n1. REGRA DE INTELIGÊNCIA E COMPARAÇÃO\n\nDIFERENÇAS: Se perguntarem \"Qual a diferença\", responda de forma comparativa e curta, sem o passo a passo completo.\n\nSTATUS E OBS: Priorize sempre as informações em \"OBS\". Elas são as regras de negócio soberanas.\n\nCATÁLOGO COMPLETO DE TUTORIAIS (GATILHO ESPECÍFICO):\n\nGATILHO: Se o usuário disser \"Não consigo acessar as vídeo aulas\" ou pedir \"todos os vídeos/tutoriais\".\n\nAÇÃO: Invoque a ferramenta supabase_vector_store com o termo \"Segue abaixo um link de vídeo para mais informações\".\n\nFORMATO DE RESPOSTA: Responda com a frase: \"Aqui estão todos os nossos tutoriais em vídeo para te ajudar:\" seguido da lista de títulos e links.\n\nREGRA DE ESPAÇAMENTO: É OBRIGATÓRIO pular uma linha entre cada tutorial para facilitar a leitura no WhatsApp.\n\nEXEMPLO DE FORMATO:\n\n1. [Título do Vídeo 1] - [Link 1]\n\n2. [Título do Vídeo 2] - [Link 2]\n\nPor que isso é necessário?\n\nFORMATO DE RESPOSTA (VOZ DE COMANDO)\n\nESTILO IMPERATIVO: Substitua \"O usuário deve clicar\" por \"1) Clique em...\", \"2) Acesse...\".\n\nLIMPEZA: Remova frases de sistema (\"O sistema exibirá...\"). Vá direto ao que o usuário precisa FAZER.\n\nLINKS: Só exiba se estiverem no MESMO bloco de texto do tópico. Formato: \"Assista ao tutorial: [Título] - [URL]\".\n\nLIMITES: Máximo 300 palavras. Sem introduções longas ou recapitular a pergunta. Pare de escrever no último passo.\n\n3. FILTRO DE ENTRADA E PERSONA\n\nSAUDAÇÕES E APRESENTAÇÕES: Se o usuário apenas se cumprimentar ou se apresentar (ex: \"Olá\", \"Meu nome é...\", \"Sou de tal setor\"), responda OBRIGATORIAMENTE com o bloco abaixo na íntegra:\n\n\"Olá! Sou o GTVinho, seu assistente do sistema GTV. Como posso te ajudar hoje?\n(Para falar com um humano, digite Atendente a qualquer momento). Passo a passo de utilização do sistema: https://www.scge.pe.gov.br/\nAcesse o site da SCGE, clique na aba \"Sistemas\" (na parte superior da tela inicial) e em seguida na aba \"Gerenciamento de Transferências Voluntarias e Parcerias (GTV)\".\"\n\nFILTRO DE BUSCA: NÃO invoque a ferramenta supabase_vector_store para mensagens que contenham apenas cumprimentos ou apresentações pessoais. Só faça a busca se houver uma dúvida ou ação técnica.\n\nNÃO ENCONTRADO: Use esta frase APENAS se após a busca no Supabase não houver resposta técnica. Nunca use para responder a nomes de pessoas ou setores.\n\nPROIBIÇÃO: É terminantemente proibido fazer buscas no Supabase para nomes de pessoas ou cargos. Nunca diga \"não encontrei informações sobre [Nome do Usuário]\".\n\nAGRADECIMENTOS: Se o usuário agradecer (\"Obrigado\", \"Valeu\", \"Show\"), responda de forma curta: \"Por nada! Estou à disposição para ajudar com o GTV. Até logo!\" e pare de escrever.\n\nSINALIZAÇÃO DE TRANSBORDO:\n\nGATILHOS DIRETOS: Se o usuário pedir \"Atendente\", \"Humano\", \"Falar com alguém\".\n\nGATILHOS POR CONTEXTO: Se o usuário perguntar sobre \"Convênio\" ou \"Solicitação de Esclarecimento\".\n\nRESPOSTA OBRIGATÓRIA: Em ambos os casos, responda ÚNICA E EXCLUSIVAMENTE com a tag oculta: #TRANSBORDO_GTV#\n\nPROIBIÇÃO: É terminantemente proibido enviar qualquer texto junto com a tag.\n\nSEM DESPEDIDAS LONGAS: Não ofereça ajuda adicional após o agradecimento ou após o último passo técnico, a menos que seja solicitado.\n\nDIFERENCIAÇÃO DE MODALIDADE (ID 1.2):\n\nSe o usuário perguntar sobre Inexigibilidade ou Dispensa, NÃO aplique as regras de Chamamento Público Comum.\n\nVerifique no manual se o campo \"Prazo de Impugnação\" deve ser preenchido com 0 (zero). Nunca invente prazos baseados em \"legislação\".\n\nGATILHO DE FORMULÁRIO:\n\nIDENTIFICAÇÃO: Se o usuário perguntar por \"formulário\", \"modelo de acesso\" ou \"solicitação de acesso\".\n\nAÇÃO DE BUSCA: Invoque a ferramenta supabase_vector_store usando o termo exato: \"Solicitação de Acesso ao Sistema GTV\".\n\nFIDELIDADE TOTAL: Para este tópico específico, é PROIBIDO resumir ou alterar o texto. Você deve entregar o conteúdo retornado na íntegra, mantendo os e-mails (gtv@scge e cau@sefaz) e o link do Google Drive exatamente como estão no manual.",
+          "maxIterations": 5
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 3.1,
+      "position": [
+        2704,
+        1376
+      ],
+      "id": "b6497edb-8780-484b-b750-fd0158d9f010",
+      "name": "AI Agent"
+    },
+    {
+      "parameters": {
+        "mode": "retrieve-as-tool",
+        "toolDescription": "Use esta ferramenta para consultar TODOS os manuais do sistema GTV, especialmente para dúvidas sobre status de propostas, prazos de recursos e fluxos de cadastramento.",
+        "tableName": {
+          "__rl": true,
+          "value": "documents",
+          "mode": "list",
+          "cachedResultName": "documents"
+        },
+        "topK": 6,
+        "options": {
+          "queryName": "hybrid_search"
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.vectorStoreSupabase",
+      "typeVersion": 1.3,
+      "position": [
+        2944,
+        1488
+      ],
+      "id": "6b0ee783-84f2-412e-acf2-788b612d05e3",
+      "name": "Supabase Vector Store1",
+      "credentials": {
+        "supabaseApi": {
+          "id": "gPXx6Il6r18WZpjg",
+          "name": "Supabase account / AI Agent"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.embeddingsOpenAi",
+      "typeVersion": 1.2,
+      "position": [
+        2944,
+        1648
+      ],
+      "id": "1a3c8cf5-ebc6-4ada-aa62-4514e4bc034e",
+      "name": "Embeddings OpenAI1",
+      "credentials": {
+        "openAiApi": {
+          "id": "zF67ajQujhb4NfA3",
+          "name": "OpenAi account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 3
+          },
+          "conditions": [
+            {
+              "id": "c55e79db-ef50-4c74-9502-68bb6852f658",
+              "leftValue": "={{ $json.output }}",
+              "rightValue": "#TRANSBORDO_GTV#",
+              "operator": {
+                "type": "string",
+                "operation": "contains"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.3,
+      "position": [
+        3328,
+        1184
+      ],
+      "id": "263f5201-be0b-4d49-94d2-900334f43445",
+      "name": "If"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "http://evolution-api:8080/message/sendText/Chatbot%20teste",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "apikey",
+              "value": "C0BED0B1FB62-4D39-80DD-9C1555D3B9F7"
+            }
+          ]
+        },
+        "sendBody": true,
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "number",
+              "value": "={{ $('Editar Dados').item.json.message_from }}"
+            },
+            {
+              "name": "text",
+              "value": "={{ $json.mensagens_formatadas[0] || \"Desculpe, tive um problema ao processar sua resposta. Pode repetir?\" }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.3,
+      "position": [
+        4272,
+        1792
+      ],
+      "id": "73f0673f-2be4-44f4-8a6e-f4a3b9194666",
+      "name": "Enviar Mensagem1"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "http://evolution-api:8080/message/sendText/Chatbot%20teste",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "apikey",
+              "value": "C0BED0B1FB62-4D39-80DD-9C1555D3B9F7"
+            }
+          ]
+        },
+        "sendBody": true,
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "number",
+              "value": "={{ $('Editar Dados').item.json.message_from }}"
+            },
+            {
+              "name": "text",
+              "value": "Sua solicitação foi enviada para nossa equipe técnica. Você será atendido em instantes."
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.3,
+      "position": [
+        3840,
+        1168
+      ],
+      "id": "413d233f-9421-474d-b8d8-96ae987eb3d0",
+      "name": "Enviar Mensagem2"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "http://evolution-api:8080/message/sendText/Chatbot%20teste",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "apikey",
+              "value": "C0BED0B1FB62-4D39-80DD-9C1555D3B9F7"
+            }
+          ]
+        },
+        "sendBody": true,
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "number",
+              "value": "={{ $('Webhook').item.json.body.sender }}"
+            },
+            {
+              "name": "text",
+              "value": "=🚨 ALERTA DE SOLICITAÇÃO\n\nCliente: {{ $('Webhook').item.json.body.data.pushName }}\n\nResumo da conversa: \n{{ $('Resumo da conversa para atendente').item.json.text }}\n\n👇 CLIQUE NO LINK PARA ATENDER\nhttps://wa.me/{{ $('Editar Dados').item.json.message_from.split('@')[0] }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.3,
+      "position": [
+        4032,
+        1168
+      ],
+      "id": "e305f7a7-bddf-4db1-8261-243d6febf889",
+      "name": "Transbordo"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "http://evolution-api:8080/chat/markChatUnread/Chatbot%20teste",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "apikey",
+              "value": "C0BED0B1FB62-4D39-80DD-9C1555D3B9F7"
+            }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n  \"number\": \"{{ $node[\"Webhook\"].json.body.sender }}\",\n  \"unread\": true,\n  \"lastMessage\": {\n    \"key\": {\n      \"remoteJid\": \"{{ $node[\"Webhook\"].json.body.sender }}\",\n      \"fromMe\": false,\n      \"id\": \"{{ $node[\"Webhook\"].json.body.data.key.id }}\"\n    }\n  }\n}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.4,
+      "position": [
+        4240,
+        1168
+      ],
+      "id": "4bebcecc-70e7-473d-babd-65b90d8a26c5",
+      "name": "Marcar como não lido"
+    },
+    {
+      "parameters": {
+        "content": "## Processo de Transbordo Humano\n- Validação (Nó IF): O fluxo verifica se o Agente de IA decidiu pelo transbordo (através de uma tag específica no conteúdo da resposta).\n- Execução do Alerta (3 Nós HTTP Request):\n   1) Notificação ao Cliente: O primeiro nó envia uma mensagem automática ao usuário informando que ele será transferido para um atendente humano.\n   2) Ação de Transbordo: O segundo nó executa a rota da Evolution API para desativar o Typebot ou marcar a instância, garantindo que a IA pare de responder aquele JID.\n  3) Sinalização Visual: O último nó envia o comando markChatUnread, forçando a notificação de \"não lido\" no painel do atendente para garantir a prioridade do atendimento.",
+        "height": 576,
+        "width": 1376,
+        "color": 7
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        3296,
+        896
+      ],
+      "typeVersion": 1,
+      "id": "4361270b-878e-45f6-a8ad-4fbffb6be57e",
+      "name": "Sticky Note10"
+    },
+    {
+      "parameters": {
+        "content": "",
+        "height": 608,
+        "width": 1424,
+        "color": 4
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        3280,
+        880
+      ],
+      "typeVersion": 1,
+      "id": "61b8e8d1-6a72-469f-adc6-9e5f070d6dc2",
+      "name": "Sticky Note7"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "12f4c4c3-9f86-4ea4-aa80-cedb1b53c066",
+              "name": "payload",
+              "value": "={{ JSON.stringify({ \"id\": $('Editar Dados').item.json.message_id, \"content\": $('Editar Dados').item.json.message_content }) }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        1120,
+        1536
+      ],
+      "id": "7869b683-f6ac-48b0-b899-f66c72d31819",
+      "name": "Edit Fields"
+    },
+    {
+      "parameters": {
+        "content": "## TODO\n\n- fazer a IA não responder o cliente depois que o atendente assume a conversa. FEITO\n- colocar o histórico da solicitação com as últimas mensagens do usuário. FEITO\n- Adicionar 3 min +- para cada mensagem que o usuário enviar quando o Agent estiver bloqueado. FEITO",
+        "height": 688,
+        "width": 928,
+        "color": 7
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        1280,
+        2288
+      ],
+      "typeVersion": 1,
+      "id": "d3f4b6f1-b108-427b-992b-a0e3fe56b2b6",
+      "name": "Sticky Note11"
+    },
+    {
+      "parameters": {
+        "fieldsToAggregate": {
+          "fieldToAggregate": [
+            {
+              "fieldToAggregate": "message_from"
+            },
+            {
+              "fieldToAggregate": "texto_limpo"
+            }
+          ]
+        },
+        "options": {
+          "includeBinaries": false
+        }
+      },
+      "type": "n8n-nodes-base.aggregate",
+      "typeVersion": 1,
+      "position": [
+        2336,
+        1376
+      ],
+      "id": "cc748343-aef3-41c3-99a3-70755da00b72",
+      "name": "Aggregate"
+    },
+    {
+      "parameters": {
+        "operation": "executeQuery",
+        "query": "SELECT \n    message->>'text' AS texto_limpo\nFROM content\nWHERE session_id = '{{ $('Editar Dados').item.json.message_from }}'\n  AND message->>'role' = 'user'\nORDER BY id DESC \nLIMIT 1;",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.postgres",
+      "typeVersion": 2.6,
+      "position": [
+        1696,
+        1392
+      ],
+      "id": "70bb5b71-56a9-4fc0-af2e-60029187d78e",
+      "name": "Obter mensagens",
+      "credentials": {
+        "postgres": {
+          "id": "VukkKqbD4M9KhCUS",
+          "name": "Postgres Supabase"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "executeQuery",
+        "query": "INSERT INTO content (session_id, message) \nVALUES (\n  '{{ $('Editar Dados').item.json.message_from }}', \n  '{{ JSON.stringify({ role: \"user\", text: $('Editar Dados').item.json.message_content }).replace(/'/g, \"''\") }}'\n);",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.postgres",
+      "typeVersion": 2.6,
+      "position": [
+        1328,
+        1536
+      ],
+      "id": "87a4a7d9-8eb4-4ecd-aef9-cc7b82d99bec",
+      "name": "Publicar mensagem no banco",
+      "credentials": {
+        "postgres": {
+          "id": "VukkKqbD4M9KhCUS",
+          "name": "Postgres Supabase"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "79c3f795-d66b-488d-a63f-e264f44778d0",
+              "name": "=message_id",
+              "value": "={{ $json.body.data.key?.id || \"\" }}",
+              "type": "string"
+            },
+            {
+              "id": "e831bf4c-88bd-4a04-91be-b738753d0485",
+              "name": "message_from",
+              "value": "={{ $json.body.data.key.remoteJid }}",
+              "type": "string"
+            },
+            {
+              "id": "ec420a5e-1820-4e07-9f0c-d452c4f11004",
+              "name": "message_content",
+              "value": "={{ $json.body.data.message.conversation }}",
+              "type": "string"
+            },
+            {
+              "id": "adbbdcc1-1ec4-4d56-944c-221304112ac2",
+              "name": "message_timestamp",
+              "value": "={{ $('Webhook').item.json.body.date_time }}",
+              "type": "string"
+            },
+            {
+              "id": "62b8dd6e-732a-452b-9a4d-819cd5e72748",
+              "name": "push_name",
+              "value": "={{ $json.body.data.pushName }}",
+              "type": "string"
+            },
+            {
+              "id": "6660414d-b817-41fa-9370-713eb7b77cc1",
+              "name": "from_me",
+              "value": "={{ $json.body.data.key.fromMe }}",
+              "type": "boolean"
+            },
+            {
+              "id": "08f9f7d6-2be4-4db3-8da7-75e299df157f",
+              "name": "botName",
+              "value": "Atendimento GTV",
+              "type": "string"
+            },
+            {
+              "id": "755962a1-d1b0-4b0b-baf7-c9444dfa812f",
+              "name": "remoteJid",
+              "value": "={{ $json.body.data.key.previousRemoteJid }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        304,
+        1504
+      ],
+      "id": "3d34f51d-3c42-48e2-83ae-3c55c6419af8",
+      "name": "Editar Dados"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "loose",
+            "version": 3
+          },
+          "conditions": [
+            {
+              "id": "cb205ff5-5bae-4d58-a6d2-cb6667ba80cf",
+              "leftValue": "={{ $json.bloqueioBot }}",
+              "rightValue": "",
+              "operator": {
+                "type": "boolean",
+                "operation": "exists",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "looseTypeValidation": true,
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.3,
+      "position": [
+        896,
+        1520
+      ],
+      "id": "f9561cab-cf23-45e5-8e5b-ab5c415d6876",
+      "name": "If1"
+    },
+    {
+      "parameters": {
+        "operation": "executeQuery",
+        "query": "SELECT * FROM (\n    SELECT \n        id,\n        '{{ $('Editar Dados').item.json.message_from }}' AS message_from,\n        message->>'text' AS texto_limpo,\n        message->>'role' AS tipo\n    FROM content\n    WHERE session_id = '{{ $('Editar Dados').item.json.message_from }}'\n    ORDER BY id DESC\n    LIMIT 5\n) AS sub\nORDER BY id ASC;",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.postgres",
+      "typeVersion": 2.6,
+      "position": [
+        2112,
+        1376
+      ],
+      "id": "cf86a282-0bfb-4c22-8123-ab78305c4632",
+      "name": "Buscar Histórico Recente",
+      "credentials": {
+        "postgres": {
+          "id": "VukkKqbD4M9KhCUS",
+          "name": "Postgres Supabase"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "sessionIdType": "customKey",
+        "sessionKey": "={{ $json.message_from }}",
+        "tableName": "content",
+        "contextWindowLength": 3
+      },
+      "type": "@n8n/n8n-nodes-langchain.memoryPostgresChat",
+      "typeVersion": 1.3,
+      "position": [
+        2800,
+        1568
+      ],
+      "id": "4d440687-05b1-4b34-8bf7-9d36a1982b94",
+      "name": "Postgres Chat Memory",
+      "credentials": {
+        "postgres": {
+          "id": "VukkKqbD4M9KhCUS",
+          "name": "Postgres Supabase"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "model": {
+          "__rl": true,
+          "value": "gpt-4.1-nano-2025-04-14",
+          "mode": "list",
+          "cachedResultName": "gpt-4.1-nano-2025-04-14"
+        },
+        "builtInTools": {},
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
+      "typeVersion": 1.3,
+      "position": [
+        3536,
+        1344
+      ],
+      "id": "cf168c79-b1e7-4023-a157-fd08d394883c",
+      "name": "OpenAI Chat Model1",
+      "credentials": {
+        "openAiApi": {
+          "id": "zF67ajQujhb4NfA3",
+          "name": "OpenAi account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "={{ $('Aggregate').item.json.texto_limpo }}",
+        "messages": {
+          "messageValues": [
+            {
+              "message": "Você é um resumidor de conversa. Você pegará os principais pontos da conversa e fará um resumo em bullet point - para isso a lista deverá usar \"-\"."
+            }
+          ]
+        },
+        "batching": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.chainLlm",
+      "typeVersion": 1.9,
+      "position": [
+        3536,
+        1168
+      ],
+      "id": "afd88058-46e6-4b2a-a40e-8fe19fb6a5cd",
+      "name": "Resumo da conversa para atendente"
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "={{ $('AI Agent').item.json.output }}",
+        "messages": {
+          "messageValues": [
+            {
+              "message": "Você é um assistente de formatação especializado em WhatsApp. Sua função é organizar o texto técnico do GTVinho para torná-lo visualmente escaneável.\n\n# REGRA DE REPASSE DIRETO E PRESERVAÇÃO (CRÍTICO):\n\nMANUTENÇÃO DE BLOCO: É TERMINANTEMENTE PROIBIDO remover, truncar ou resumir o texto explicativo sobre o site da SCGE (https://www.scge.pe.gov.br/).\n\nINTEGRIDADE DA SAUDAÇÃO: Se o texto recebido começar com \"Olá! Sou o GTVinho\", você deve MANTER OBRIGATORIAMENTE todo o passo a passo de navegação no site da SCGE que segue abaixo da saudação.\n\nNÃO CORTAR: Se a mensagem recebida for longa, formate o bloco inteiro como uma única string dentro do array JSON.\n\n# FORMATAÇÃO OBRIGATÓRIA DA SAUDAÇÃO (SINTAXE WHATSAPP):\n\nNOME GTVinho: Mantenha \"GTVinho\" em texto normal, sem asteriscos.\n\nFRASE DE SUPORTE: A frase entre parênteses deve ser formatada EXATAMENTE assim (com o underline colado no parênteses): _(Para falar com um humano, digite *Atendente* a qualquer momento)._\n\nAJUSTE DE ESPAÇAMENTO: Após a frase de suporte entre parênteses, insira APENAS UMA quebra de linha (\\n) antes de começar o \"Passo a passo\". O objetivo é que o texto do site da SCGE comece imediatamente na linha de baixo, sem linhas em branco.\n\n# REGRAS DE VERTICALIZAÇÃO E LISTAS:\n\nQUEBRA POR PASSO: Cada número (1, 2, 3...) deve começar em uma nova linha (\\n).\n\nSUB-ITENS: Liste campos e abas com hífens logo abaixo do passo correspondente.\n\nESPAÇAMENTO DE TUTORIAL: Insira exatamente duas quebras de linha (\\n\\n) antes de \"Assista ao tutorial\".\n\n# REGRAS DE ESTILO (PADRÃO WHATSAPP):\n\nNEGRITO EM TERMOS: Aplique negrito (*Termo*) em nomes de botões, menus, campos, abas e funcionalidades (ex: Sistemas, GTV, Cadastro do Chamamento, Detalhar, Localizar).\n\nTUTORIAL: Formate exatamente assim: Assista ao tutorial: *Título do Vídeo* - URL\n\nLINK INSTITUCIONAL: O link https://www.scge.pe.gov.br/ deve ser mantido como texto simples, sem a frase \"Assista ao tutorial\" antes dele.\n\n# FORMATO DE SAÍDA (CRÍTICO):\n\nO array JSON deve conter EXATAMENTE UMA ÚNICA STRING com o texto completo.\n\nEXEMPLO DE ESTRUTURA CORRETA:\n[\"Olá! Sou o GTVinho, seu assistente do sistema GTV. Como posso te ajudar hoje?\\n_(Para falar com um humano, digite *Atendente* a qualquer momento)._\\n\\nPasso a passo de utilização do sistema: https://www.scge.pe.gov.br/\\nAcesse o site da SCGE, clique na aba *Sistemas* (na parte superior da tela inicial) e em seguida na aba *Gerenciamento de Transferências Voluntarias e Parcerias (GTV)*.\"]\n\n# REGRA DE TUTORIAL (TRAVA DE SEGURANÇA):\n\nÉ PROIBIDO adicionar a frase \"Assista ao tutorial\" se o texto original não trouxer um link de vídeo."
+            }
+          ]
+        },
+        "batching": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.chainLlm",
+      "typeVersion": 1.9,
+      "position": [
+        3328,
+        1776
+      ],
+      "id": "5688d762-3905-436d-9b48-b5379b1aa5b5",
+      "name": "Basic LLM Chain"
+    },
+    {
+      "parameters": {
+        "model": {
+          "__rl": true,
+          "value": "gpt-4.1-mini-2025-04-14",
+          "mode": "list",
+          "cachedResultName": "gpt-4.1-mini-2025-04-14"
+        },
+        "builtInTools": {},
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
+      "typeVersion": 1.3,
+      "position": [
+        3328,
+        1984
+      ],
+      "id": "cbeb3c90-d1d1-4fd9-97f1-70e30748e194",
+      "name": "OpenAI Chat Model2",
+      "credentials": {
+        "openAiApi": {
+          "id": "zF67ajQujhb4NfA3",
+          "name": "OpenAi account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "// Pega o texto bruto vindo do LLM\nlet rawText = $input.item.json.output || $input.item.json.text; \n\nif (typeof rawText === 'string') {\n  try {\n    // 1. Limpa espaços em branco no início/fim e caracteres de controle invisíveis\n    const cleanText = rawText.trim().replace(/[\\u0000-\\u001F\\u007F-\\u009F]/g, \"\");\n\n    // 2. Tenta o parse direto\n    const messagesArray = JSON.parse(cleanText);\n    \n    return {\n      mensagens_formatadas: Array.isArray(messagesArray) ? messagesArray : [messagesArray]\n    };\n  } catch (e) {\n    // 3. Fallback: Se falhar (como no erro do token '\\'), tenta limpar aspas extras\n    try {\n        // Remove possíveis quebras de linha literais que quebram o parser\n        const secondaryClean = rawText.replace(/\\n/g, \" \"); \n        return {\n            mensagens_formatadas: [JSON.parse(secondaryClean)]\n        };\n    } catch (e2) {\n        // Se tudo falhar, retorna o texto bruto dentro de um array para o WhatsApp não quebrar\n        return {\n          mensagens_formatadas: [rawText],\n          erro_original: e.message\n        };\n    }\n  }\n}\n\nreturn {\n  mensagens_formatadas: [rawText]\n};"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        3648,
+        1776
+      ],
+      "id": "17275f9c-60b7-4f5f-9fae-e00039a78f58",
+      "name": "Code in JavaScript"
+    },
+    {
+      "parameters": {
+        "jsCode": "let redisValue = $('Pega o bloqueioBot').first().json.bloqueioBot;\nlet agora = new Date();\nlet horarioExpiracao = null;\n\nif (redisValue && typeof redisValue === 'string') {\n    horarioExpiracao = new Date(redisValue);\n}\n\nif (horarioExpiracao && !isNaN(horarioExpiracao.getTime()) && horarioExpiracao > agora) {\n    // SOMA: Adiciona 3 minutos (180.000ms)\n    let novoHorario = new Date(horarioExpiracao.getTime() + 180000); \n    \n    // Calcula o TTL inicial em segundos\n    let novoTTL = Math.round((novoHorario.getTime() - agora.getTime()) / 1000);\n\n    // --- TRAVA DE SEGURANÇA: MÁXIMO 1 HORA (3600 segundos) ---\n    if (novoTTL > 3600) {\n        novoTTL = 3600;\n        // Ajustamos o novo_valor para ser exatamente daqui a 1 hora\n        novoHorario = new Date(agora.getTime() + 3600000);\n    }\n    // ---------------------------------------------------------\n\n    return {\n        novo_valor: novoHorario.toISOString(),\n        novo_ttl: novoTTL,\n        status: \"SOMANDO_COM_LIMITE\"\n    };\n} else {\n    // INÍCIO: 10 minutos (600s)\n    let expiraEm = new Date(agora.getTime() + 600000); \n    return {\n        novo_valor: expiraEm.toISOString(),\n        novo_ttl: 3600,\n        status: \"NOVO_BLOQUEIO\"\n    };\n}"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1072,
+        1360
+      ],
+      "id": "9be1486b-574c-4042-9981-76f3c342d84f",
+      "name": "Calcular Extensão"
+    },
+    {
+      "parameters": {
+        "operation": "get",
+        "propertyName": "bloqueioBot",
+        "key": "={{ $('Editar Dados').item.json.botName }}_{{ $('Webhook').item.json.body.data.key.previousRemoteJid || $('Webhook').item.json.body.data.remoteJid }}_bloqueado",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.redis",
+      "typeVersion": 1,
+      "position": [
+        704,
+        1520
+      ],
+      "id": "9f37a50b-7a5a-4d2b-be9c-86e3a081a3fe",
+      "name": "Pega o bloqueioBot",
+      "credentials": {
+        "redis": {
+          "id": "8OhAbvrX7sLK35tK",
+          "name": "Redis account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "set",
+        "key": "={{ $('Editar Dados').item.json.botName }}_{{ $('Webhook').item.json.body.data.key.previousRemoteJid || $('Webhook').item.json.body.data.remoteJid }}_bloqueado",
+        "value": "={{ $json.novo_valor }}",
+        "expire": true,
+        "ttl": "={{ $json.novo_ttl }}"
+      },
+      "type": "n8n-nodes-base.redis",
+      "typeVersion": 1,
+      "position": [
+        1264,
+        1360
+      ],
+      "id": "b66a2384-61d9-444e-ab41-6173c0cfecee",
+      "name": "Aumenta o tempo do bloqueio",
+      "credentials": {
+        "redis": {
+          "id": "8OhAbvrX7sLK35tK",
+          "name": "Redis account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "59f4b65b-6afa-4f90-9962-fc9a0cbe6842",
+              "name": "encerrar",
+              "value": "={{ $('Editar Dados').item.json.message_content }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        688,
+        912
+      ],
+      "id": "c1be4bc9-8285-4b3f-8683-e26a15692b70",
+      "name": "Edit Fields1"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 3
+          },
+          "conditions": [
+            {
+              "id": "9165de95-7949-4d9c-8d9c-7c70bfd2bc9e",
+              "leftValue": "={{ $json.encerrar }}",
+              "rightValue": "/encerrar",
+              "operator": {
+                "type": "string",
+                "operation": "contains"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.3,
+      "position": [
+        880,
+        912
+      ],
+      "id": "5288aadc-0652-4242-a5d8-f97b04e66278",
+      "name": "If2"
+    },
+    {
+      "parameters": {
+        "operation": "delete",
+        "key": "={{ $('Editar Dados').item.json.botName }}_{{ $('Webhook').item.json.body.data.key?.remoteJid || $('Webhook').item.json.body.data.remoteJid }}_bloqueado"
+      },
+      "type": "n8n-nodes-base.redis",
+      "typeVersion": 1,
+      "position": [
+        1328,
+        832
+      ],
+      "id": "8b705065-5d63-4ff3-b16d-8eb67065b84c",
+      "name": "Redis",
+      "credentials": {
+        "redis": {
+          "id": "8OhAbvrX7sLK35tK",
+          "name": "Redis account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "// Pega os dados do nó de entrada (Webhook)\nconst data = $('Webhook').first().json.body.data;\n\n// Extrai o identificador da conversa (pode ser o LID ou o próprio JID)\nconst remoteJid = data.key?.remoteJid || data.remoteJid;\n\nreturn {\n  lidKey: `Atendimento GTV_${remoteJid}_bloqueado`\n};"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1088,
+        832
+      ],
+      "id": "e9a35333-a1d6-4ef5-a2e1-f0e8de4b96c6",
+      "name": "Code in JavaScript1"
+    },
+    {
+      "parameters": {
+        "operation": "set",
+        "key": "={{ $('Editar Dados').item.json.botName }}_{{ $('Editar Dados').item.json.remoteJid }}_bloqueado",
+        "value": "true",
+        "expire": true,
+        "ttl": 3600
+      },
+      "type": "n8n-nodes-base.redis",
+      "typeVersion": 1,
+      "position": [
+        4432,
+        1168
+      ],
+      "id": "463813b9-70f1-4a28-871c-5a2e0042c6f0",
+      "name": "bloqueioBot",
+      "credentials": {
+        "redis": {
+          "id": "8OhAbvrX7sLK35tK",
+          "name": "Redis account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "content": "",
+        "height": 384,
+        "width": 1168,
+        "color": 4
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        608,
+        752
+      ],
+      "typeVersion": 1,
+      "id": "dab29f0b-a7af-4f59-b74a-5f0c70617027",
+      "name": "Sticky Note3"
+    },
+    {
+      "parameters": {
+        "content": "## Encerramento de Atendimento Humano",
+        "height": 352,
+        "width": 1136,
+        "color": 7
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        624,
+        768
+      ],
+      "typeVersion": 1,
+      "id": "394a1d54-9071-4b03-8ce3-a13e5681795a",
+      "name": "Sticky Note12"
+    },
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.noOp",
+      "typeVersion": 1,
+      "position": [
+        1104,
+        992
+      ],
+      "id": "a73fff13-8f03-4d26-8a6c-4cd3ba4e9ac9",
+      "name": "No Operation, do nothing"
+    },
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.manualTrigger",
+      "typeVersion": 1,
+      "position": [
+        384,
+        2448
+      ],
+      "id": "fe2f99b6-4238-4b8e-b307-f42c89ae298e",
+      "name": "When clicking ‘Execute workflow’"
+    },
+    {
+      "parameters": {
+        "mode": "insert",
+        "tableName": {
+          "__rl": true,
+          "value": "documents",
+          "mode": "list",
+          "cachedResultName": "documents"
+        },
+        "options": {
+          "queryName": "hybrid_search"
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.vectorStoreSupabase",
+      "typeVersion": 1.3,
+      "position": [
+        768,
+        2448
+      ],
+      "id": "7eee7bbf-22a6-4b6c-a90e-7bdb142906ac",
+      "name": "Supabase Vector Store",
+      "credentials": {
+        "supabaseApi": {
+          "id": "gPXx6Il6r18WZpjg",
+          "name": "Supabase account / AI Agent"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.embeddingsOpenAi",
+      "typeVersion": 1.2,
+      "position": [
+        768,
+        2640
+      ],
+      "id": "63802065-42d0-4063-9b64-80f12841eab3",
+      "name": "Embeddings OpenAI",
+      "credentials": {
+        "openAiApi": {
+          "id": "zF67ajQujhb4NfA3",
+          "name": "OpenAi account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsonMode": "expressionData",
+        "jsonData": "={{ $json.data }}",
+        "textSplittingMode": "custom",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.documentDefaultDataLoader",
+      "typeVersion": 1.1,
+      "position": [
+        928,
+        2608
+      ],
+      "id": "9182432b-db55-419c-a724-ffba56019e54",
+      "name": "Default Data Loader"
+    },
+    {
+      "parameters": {
+        "separator": "\\n",
+        "chunkSize": 1200,
+        "chunkOverlap": 200
+      },
+      "type": "@n8n/n8n-nodes-langchain.textSplitterCharacterTextSplitter",
+      "typeVersion": 1,
+      "position": [
+        928,
+        2784
+      ],
+      "id": "d50dfc85-1a53-495e-970b-75989b6f0151",
+      "name": "Character Text Splitter"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "da44bb0c-42e7-4979-8cc2-93ed376d1b1e",
+              "name": "data",
+              "value": "Solicitação de Acesso ao Sistema GTV\n\nPara utilizar as funcionalidades do GTV, é necessário preencher o formulário de solicitação de acesso correspondente ao seu perfil. Identifique sua situação atual no sistema e-Fisco e siga as orientações abaixo: \n\n1. Já possui acesso ao e-Fisco.\nAção: Preencha o formulário de solicitação de acesso indicando as funcionalidades e os códigos de perfil (conforme anexo de atribuições).\nEnvio: Encaminhe o documento para gtv@scge.pe.gov.br.\nSuporte: Coordenação de Convênios de Despesa (SCGE).\n\n\n2. Não possui acesso ao e-Fisco.\nAção:  Preencha os formulários de cadastro no e-Fisco e o formulário de atribuição de perfil ao Módulo GTV.\nEnvio: Encaminhe ambos para cau@sefaz.pe.gov.br.\nSuporte: Central de Atendimento ao Usuário (SEFAZ).\n\nLink do Formulário GTV: https://drive.google.com/file/d/1vFHw2wDq4ryKAHHpjTa24x9R7b-Ny4zC/view\n\nImportante: A habilitação está condicionada ao envio dos formulários devidamente preenchidos. Em caso de dúvidas, utilize os canais de contato disponíveis neste portal.",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        576,
+        2448
+      ],
+      "id": "87709260-b5b5-47b0-ab27-f95992323f4b",
+      "name": "Edit Fields2"
+    },
+    {
+      "parameters": {
+        "content": "## Processamento de Documentos\n",
+        "height": 688,
+        "width": 928,
+        "color": 7
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        304,
+        2288
+      ],
+      "typeVersion": 1,
+      "id": "7e7ef1e3-b85f-4078-9d89-7be95f9c2945",
+      "name": "Sticky Note13"
+    },
+    {
+      "parameters": {
+        "content": "",
+        "height": 720,
+        "width": 960,
+        "color": 4
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        288,
+        2272
+      ],
+      "typeVersion": 1,
+      "id": "cfdd18e5-b084-42a6-94c8-7d40046b22be",
+      "name": "Sticky Note14"
+    },
+    {
+      "parameters": {
+        "content": "",
+        "height": 720,
+        "width": 960,
+        "color": 4
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        1264,
+        2272
+      ],
+      "typeVersion": 1,
+      "id": "07a4bbd9-f6a0-4e50-aadc-e117334eb9a0",
+      "name": "Sticky Note15"
+    },
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.wait",
+      "typeVersion": 1.1,
+      "position": [
+        2528,
+        1376
+      ],
+      "id": "645050ac-c002-4d0b-89de-838528d6f4dd",
+      "name": "Wait",
+      "webhookId": "e13a027e-704e-446b-89d0-4357daede5f3"
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Webhook": {
+      "main": [
+        [
+          {
+            "node": "Editar Dados",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Verificar se usuário parou de digitar": {
+      "main": [
+        [
+          {
+            "node": "Buscar Histórico Recente",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Usuário ainda está digitando, parar o fluxo",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Verificar remetente": {
+      "main": [
+        [
+          {
+            "node": "Edit Fields1",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Pega o bloqueioBot",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Aguardar1": {
+      "main": [
+        [
+          {
+            "node": "Loop Mensagens1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Loop Mensagens1": {
+      "main": [
+        [
+          {
+            "node": "Encerrar envio",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Enviar Mensagem1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "OpenAI Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "AI Agent": {
+      "main": [
+        [
+          {
+            "node": "If",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Supabase Vector Store1": {
+      "ai_tool": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Embeddings OpenAI1": {
+      "ai_embedding": [
+        [
+          {
+            "node": "Supabase Vector Store1",
+            "type": "ai_embedding",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "If": {
+      "main": [
+        [
+          {
+            "node": "Resumo da conversa para atendente",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Basic LLM Chain",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Enviar Mensagem1": {
+      "main": [
+        [
+          {
+            "node": "Aguardar1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Enviar Mensagem2": {
+      "main": [
+        [
+          {
+            "node": "Transbordo",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Transbordo": {
+      "main": [
+        [
+          {
+            "node": "Marcar como não lido",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Marcar como não lido": {
+      "main": [
+        [
+          {
+            "node": "bloqueioBot",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Edit Fields": {
+      "main": [
+        [
+          {
+            "node": "Publicar mensagem no banco",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Aggregate": {
+      "main": [
+        [
+          {
+            "node": "Wait",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Obter mensagens": {
+      "main": [
+        [
+          {
+            "node": "Verificar se usuário parou de digitar",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Publicar mensagem no banco": {
+      "main": [
+        [
+          {
+            "node": "5 Segundos",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Obter mensagens",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Editar Dados": {
+      "main": [
+        [
+          {
+            "node": "Verificar remetente",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "If1": {
+      "main": [
+        [
+          {
+            "node": "Calcular Extensão",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Edit Fields",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Buscar Histórico Recente": {
+      "main": [
+        [
+          {
+            "node": "Aggregate",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Postgres Chat Memory": {
+      "ai_memory": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_memory",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "OpenAI Chat Model1": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "Resumo da conversa para atendente",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Resumo da conversa para atendente": {
+      "main": [
+        [
+          {
+            "node": "Enviar Mensagem2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Basic LLM Chain": {
+      "main": [
+        [
+          {
+            "node": "Code in JavaScript",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "OpenAI Chat Model2": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "Basic LLM Chain",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code in JavaScript": {
+      "main": [
+        [
+          {
+            "node": "Loop Mensagens1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Calcular Extensão": {
+      "main": [
+        [
+          {
+            "node": "Aumenta o tempo do bloqueio",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Pega o bloqueioBot": {
+      "main": [
+        [
+          {
+            "node": "If1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Aumenta o tempo do bloqueio": {
+      "main": [
+        []
+      ]
+    },
+    "Edit Fields1": {
+      "main": [
+        [
+          {
+            "node": "If2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "If2": {
+      "main": [
+        [
+          {
+            "node": "Code in JavaScript1",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "No Operation, do nothing",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code in JavaScript1": {
+      "main": [
+        [
+          {
+            "node": "Redis",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "When clicking ‘Execute workflow’": {
+      "main": [
+        [
+          {
+            "node": "Edit Fields2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Embeddings OpenAI": {
+      "ai_embedding": [
+        [
+          {
+            "node": "Supabase Vector Store",
+            "type": "ai_embedding",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Default Data Loader": {
+      "ai_document": [
+        [
+          {
+            "node": "Supabase Vector Store",
+            "type": "ai_document",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Character Text Splitter": {
+      "ai_textSplitter": [
+        [
+          {
+            "node": "Default Data Loader",
+            "type": "ai_textSplitter",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Edit Fields2": {
+      "main": [
+        [
+          {
+            "node": "Supabase Vector Store",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Wait": {
+      "main": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": true,
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate",
+    "availableInMCP": false
+  },
+  "versionId": "1a4732fc-fc80-425e-8fda-e92d15cc69e5",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "0551f7a0acbd0bc5d727a8a5e280d5d478f85170f7936a5d39e1e1780772ad3a"
+  },
+  "id": "FGBUuAvb11vXJxX7R-Ng0",
+  "tags": [
+    {
+      "updatedAt": "2026-03-09T11:13:33.648Z",
+      "createdAt": "2026-03-09T11:13:33.648Z",
+      "id": "WOtyE5zkKbTQmaN1",
+      "name": "01"
+    }
+  ]
+}
